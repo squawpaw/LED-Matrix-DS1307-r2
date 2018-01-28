@@ -9,10 +9,8 @@
 
 #include <Adafruit_GFX.h>   // Core graphics library
 #include <RGBmatrixPanel.h> // Hardware-specific library
-//#include "DHT.h" // dht22
 #include <Wire.h>
 #include "RTClib.h"
-//#include <Fonts/FreeMono12pt7b.h> // don't need fonts for just a clock
 
 #define DHTTYPE DHT22
 
@@ -24,7 +22,7 @@
 #define C   A2
 RGBmatrixPanel matrix(A, B, C, CLK, LAT, OE, false);
 
-byte LEDBRIGHTNESS = 32; // 0-255
+//byte LEDBRIGHTNESS = 32; // 0-255 .  I think LEDBRIGHTNESS can be taken out
 int previousMinute = -1;
 char buffer[4];
 
@@ -149,19 +147,19 @@ const char* const string_table[] PROGMEM = {zero, one, two, three, four, five, s
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("DHT22 test!");
-//  dht.begin();
+  Serial.println("Begin the clock!");
   matrix.begin();
 
 
   // clock start
   if (! rtc.begin()){
-    Serial.println("couldn't find RTC");
+    Serial.println("couldn't find RTC.  Looping until RTC is connected.");
     while(1);
   }
 
   if (! rtc.isrunning()){
     Serial.println("RTC is NOT running!");
+    // Set datetime to local settings
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     // This line sets the RTC with an explicit date & time, for example to set
     // January 21, 2014 at 3am you would call:
@@ -170,11 +168,8 @@ void setup() {
   
   matrix.drawPixel(0, 0, matrix.Color333(7, 7, 7)); 
   delay(500);
-  
   matrix.setCursor(8, 14);   // start at top left, with one pixel of spacing
-//  matrix.setFont(&FreeMono12pt7b);
   matrix.setTextColor(matrix.Color333(6,4,0));
-  matrix.print('Hello');
   matrix.fillScreen(matrix.Color333(0, 0, 0));
 }
 
@@ -198,14 +193,14 @@ void loop() {
     String min = convertIntTo2DigitString(currentMinute);
     String hour = convertIntTo2DigitString(currentHour);
     
-//    matrix.setCursor(0,15);
     matrix.setTextSize(1);
     matrix.fillScreen(matrix.Color333(0,0,0));
     matrix.setTextColor(matrix.Color333(4,2,0));
-// Try to print out bitmaps of minutes
+    
+//  Print out bitmaps of minutes
     matrix.drawBitmap(5, 3, (byte*)noArray[(int)hour[0]-'0'], 3, 9, matrix.Color333(4,1,0));
     matrix.drawBitmap(10, 3, (byte*)noArray[(int)hour[1]-'0'], 3, 9, matrix.Color333(4,1,0));
-    matrix.drawBitmap(15, 3, (byte*)noArray[10], 3, 9, matrix.Color333(3,1,0));
+    matrix.drawBitmap(15, 3, (byte*)noArray[10], 3, 9, matrix.Color333(3,1,0)); // colon
     matrix.drawBitmap(19, 3, (byte*)noArray[(int)min[0]-'0'], 3, 9, matrix.Color333(4,1,0));
     matrix.drawBitmap(24, 3, (byte*)noArray[(int)min[1]-'0'], 3, 9, matrix.Color333(4,1,0));
     delay(5000);
