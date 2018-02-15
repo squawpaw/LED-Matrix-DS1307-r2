@@ -12,8 +12,6 @@
 #include <Wire.h>
 #include "RTClib.h"
 
-#define DHTTYPE DHT22
-
 #define CLK 8  // MUST be on PORTB! (Use pin 11 on Mega)
 #define LAT A3
 #define OE  9
@@ -22,7 +20,6 @@
 #define C   A2
 RGBmatrixPanel matrix(A, B, C, CLK, LAT, OE, false);
 
-//byte LEDBRIGHTNESS = 32; // 0-255 .  I think LEDBRIGHTNESS can be taken out
 int previousMinute = -1;
 char buffer[4];
 
@@ -165,6 +162,8 @@ void setup() {
     // January 21, 2014 at 3am you would call:
      // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
   }
+
+  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   
   matrix.drawPixel(0, 0, matrix.Color333(7, 7, 7)); 
   delay(500);
